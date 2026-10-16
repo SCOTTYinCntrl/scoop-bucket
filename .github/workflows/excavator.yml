@@ -5,13 +5,21 @@ on:
     - cron: "0 3 * * *"
   workflow_dispatch:
 
+# The Excavator commits updated manifests back to the repository, so the
+# workflow token needs write access to repository contents. Without this the
+# push fails with "Permission ... denied to github-actions[bot]" (HTTP 403).
+permissions:
+  contents: write
+
 jobs:
   excavate:
     name: Excavate manifests
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@main
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Excavate
         uses: ScoopInstaller/GithubActions@main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SKIP_UPDATED: 1
